@@ -1,0 +1,144 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ru._21_school.swingy.database.dao.PersonDao">
+
+    <resultMap id="personMap" type="ru._21_school.swingy.model.person.Person">
+        <id column="ID" property="id"/>
+        <result column="NAME" property="name"/>
+        <result column="RACE" property="race"/>
+        <result column="LEVEL" property="level"/>
+        <result column="EXPERIENCE" property="experience"/>
+        <result column="HIT_POINTS" property="hitPoints"/>
+        <result column="HIT_POINTS" property="fullHitPoints"/>
+        <result column="ATTACK" property="attack"/>
+        <result column="DEFENSE" property="defense"/>
+        <result column="AGILITY" property="agility"/>
+
+        <collection property="equipments" javaType="ArrayList" ofType="ru._21_school.swingy.model.equipment.Equipment">
+            <result column="EQUIP_NAME" property="name"/>
+            <result column="TYPE" property="type"/>
+            <result column="BONUS_ATTACK" property="bonusAttack"/>
+            <result column="BONUS_DEFENSE" property="bonusDefense"/>
+            <result column="BONUS_HIT_POINTS" property="bonusHitPoints"/>
+        </collection>
+    </resultMap>
+
+    <select id="getAll" resultMap="personMap" timeout="15">
+        select p.ID,
+               p.NAME,
+               p.RACE,
+               p.LEVEL,
+               p.EXPERIENCE,
+               p.HIT_POINTS,
+               p.ATTACK,
+               p.DEFENSE,
+               p.AGILITY,
+               e.NAME as EQUIP_NAME,
+               e.TYPE,
+               e.BONUS_ATTACK,
+               e.BONUS_DEFENSE,
+               e.BONUS_HIT_POINTS
+          from PERSON p
+          left join EQUIPMENT e on e.PERSON_ID = p.ID
+
+    </select>
+
+    <insert id="insertPerson" timeout="60">
+        insert into PERSON (
+                ID,
+                NAME,
+                RACE,
+                LEVEL,
+                EXPERIENCE,
+                HIT_POINTS,
+                ATTACK,
+                DEFENSE,
+                AGILITY)
+        values (#{person.id},
+                #{person.name},
+                #{person.race},
+                #{person.level},
+                #{person.experience},
+                #{person.fullHitPoints},
+                #{person.attack},
+                #{person.defense},
+                #{person.agility})
+    </insert>
+
+    <update id="updatePerson" timeout="60">
+        update PERSON
+        <set>
+            LEVEL       = #{person.level},
+            EXPERIENCE  = #{person.experience},
+            HIT_POINTS  = #{person.fullHitPoints},
+            ATTACK      = #{person.attack},
+            DEFENSE     = #{person.defense},
+            AGILITY     = #{person.agility}
+        </set>
+        where ID = #{person.id}
+    </update>
+
+    <delete id="deletePerson" timeout="60">
+        delete from PERSON
+         where ID = #{person.id}
+    </delete>
+
+    <select id="deleteEquipments">
+        delete from EQUIPMENT
+        where PERSON_ID = #{person.id}
+    </select>
+
+    <insert id="insertEquipment">
+        insert into EQUIPMENT
+        (
+            PERSON_ID,
+            NAME,
+            TYPE,
+            BONUS_ATTACK,
+            BONUS_DEFENSE,
+            BONUS_HIT_POINTS
+        )
+        values (
+            #{person.id},
+            #{equipment.name},
+            #{equipment.type},
+            #{equipment.bonusAttack},
+            #{equipment.bonusDefense},
+            #{equipment.bonusHitPoints}
+        )
+    </insert>
+
+    <select id="getMaxPersonId" resultType="java.lang.Integer" timeout="15">
+--         select seq from sqlite_sequence WHERE name = 'PERSON'
+        select max(ID) from PERSON;
+    </select>
+
+    <update id="createPersonTable">
+        create table if not exists PERSON (
+            ID              integer primary key,
+            NAME            text,
+            RACE            text,
+            LEVEL           integer,
+            EXPERIENCE      integer,
+            HIT_POINTS      integer,
+            ATTACK          integer,
+            DEFENSE         integer,
+            AGILITY         integer
+        )
+    </update>
+
+    <update id="createEqiupmentTable">
+        create table if not exists EQUIPMENT (
+            ID                  integer primary key,
+            PERSON_ID           integer references PERSON(ID) on delete cascade,
+            NAME                text,
+            TYPE                text,
+            BONUS_ATTACK        real,
+            BONUS_DEFENSE       real,
+            BONUS_HIT_POINTS    real
+        )
+    </update>
+
+    <update id="onForeignKeys">
+        PRAGMA foreign_keys = ON
+    </update>
+</mapper>
