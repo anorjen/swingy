@@ -18,7 +18,7 @@ import java.util.List;
 public class Game {
 
     private static Game instance;
-    public static final int MAX_GAME_LEVEL = 4;
+    public static final int MAX_GAME_LEVEL = 10;
 
     private int gameMode;
     private Controller controller;

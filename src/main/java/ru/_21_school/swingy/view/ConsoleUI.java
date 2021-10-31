@@ -104,7 +104,6 @@ public class ConsoleUI {
 
     public void updateGameArea(Area area) {
         clearScreen();
-//        System.out.printf("==================== LEVEL %d =====================\n", area.getLevel());
         printPersonStat(area.getHero());
         printMap(area);
         System.out.println("Choose action:");
@@ -115,7 +114,7 @@ public class ConsoleUI {
             System.out.printf("\n\n==================== YOU WIN! =====================\n");
         }
         else {
-            System.out.printf("\n\n==================== YOU LOSE! ====================\n");
+            System.out.printf("\n\n==================== YOU DIED! ====================\n");
         }
     }
 

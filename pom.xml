@@ -14,14 +14,6 @@
     </properties>
 
     <build>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
-<!--        </resources>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -109,15 +101,5 @@
             <artifactId>hibernate-validator</artifactId>
             <version>7.0.1.Final</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.glassfish</groupId>-->
-<!--            <artifactId>javax.el</artifactId>-->
-<!--            <version>3.0.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>javax.el</groupId>-->
-<!--            <artifactId>javax.el-api</artifactId>-->
-<!--            <version>3.0.0</version>-->
-<!--        </dependency>-->
     </dependencies>
 </project>

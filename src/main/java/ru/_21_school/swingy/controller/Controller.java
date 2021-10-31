@@ -9,8 +9,6 @@ import java.util.List;
 public interface Controller {
 
     void selectHero(List<Person> persons);
-
-    void gameOver();
     void play();
     void fight(Person person1, Person person2, int damage);
     void equip(boolean isEquip, Equipment equipment);

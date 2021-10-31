@@ -229,7 +229,7 @@ public class ConsoleController implements Controller {
                 Game.getInstance().trophy();
             }
             else {
-                ui.info("YOU DIED!");
+                ui.gameOverScreen(false);
                 Game.getInstance().exitGame();
             }
         }
@@ -250,7 +250,6 @@ public class ConsoleController implements Controller {
         ui.aidInfo(aid);
     }
 
-    @Override
     public void gameOver() {
         Person hero = Game.getInstance().getHero();
         if (hero.isDead()) {

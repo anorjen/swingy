@@ -1,6 +1,5 @@
 package ru._21_school.swingy.view.swingUI;
 
-import ru._21_school.swingy.model.person.Person;
 import ru._21_school.swingy.model.person.PersonRace;
 
 import javax.swing.*;
@@ -20,7 +19,6 @@ public class CreateHero {
     private JTextField nameField;
     private int width = 400;
     private int height = 400;
-    private Person hero;
 
     public CreateHero() {
         prepareWindow();
@@ -98,10 +96,6 @@ public class CreateHero {
         mainFrame.setVisible(true);
     }
 
-    public boolean isEmpty(String s) {
-        return s == null || s.trim().isEmpty();
-    }
-
     public JFrame getMainFrame() {
         return mainFrame;
     }
@@ -116,14 +110,6 @@ public class CreateHero {
 
     public JTextField getNameField() {
         return nameField;
-    }
-
-    public Person getHero() {
-        return hero;
-    }
-
-    public void setHero(Person hero) {
-        this.hero = hero;
     }
 
     public DefaultListModel<PersonRace> getPersonListModel() {

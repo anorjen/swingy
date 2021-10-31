@@ -139,34 +139,4 @@ public class DatabaseService {
             updatePerson(person);
         }
     }
-
-//    public static void main(String[] args) {
-//        DatabaseService database = DatabaseService.getInstance();
-//        Person person = PersonFactory.newPerson(PersonRace.HUMAN, "qqq");
-//        List<Equipment> equipments = person.getEquipments();
-//        for (int i = 0; i < 3; i++) {
-//            equipments.add(EquipmentFactory.newEquip());
-//        }
-//        database.insertPerson(person);
-//
-//        List<Person> persons = database.getAll();
-//
-//        Person deletePerson = null;
-//        for (Person p : persons) {
-//            System.out.println(p);
-//            if (p.getName().equals("uuu")) {
-//                deletePerson = p;
-//            }
-//        }
-//
-//        database.deletePerson(deletePerson);
-//
-//        System.out.println();
-//        persons = database.getAll();
-//        for (Person p : persons) {
-//            System.out.println(p);
-//        }
-//
-//        database.close();
-//    }
 }

@@ -139,11 +139,6 @@ public class SwingController implements Controller {
     }
 
     @Override
-    public void gameOver() {
-
-    }
-
-    @Override
     public void play() {
         gameAreaWindow = new GameArea(Game.getInstance().getArea(), Game.getInstance().getHero());
         updateHeroPane(Game.getInstance().getHero());
