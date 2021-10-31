@@ -13,10 +13,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import ru._21_school.swingy.database.dao.PersonDao;
 import ru._21_school.swingy.model.equipment.Equipment;
-import ru._21_school.swingy.model.equipment.EquipmentFactory;
 import ru._21_school.swingy.model.person.Person;
-import ru._21_school.swingy.model.person.PersonFactory;
-import ru._21_school.swingy.model.person.PersonRace;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -60,7 +57,7 @@ public class DatabaseService {
             }
         }
         else {
-            System.out.println("database already exists ");
+            System.out.println("database already exists");
         }
     }
 
@@ -90,6 +87,7 @@ public class DatabaseService {
 
     public void close() {
         session.close();
+        System.out.println("database session closed");
     }
 
     public List<Person> getAll() {
@@ -131,6 +129,9 @@ public class DatabaseService {
     }
 
     public void savePerson(Person person) {
+        if (person == null) {
+            return;
+        }
         if (person.getId() == null || person.getId() == 0) {
             insertPerson(person);
         }

@@ -1,4 +1,4 @@
-package ru._21_school.swingy.ui;
+package ru._21_school.swingy.view;
 
 import ru._21_school.swingy.model.Area;
 import ru._21_school.swingy.model.equipment.Aid;
@@ -9,7 +9,7 @@ import ru._21_school.swingy.model.person.PersonRace;
 
 import java.util.List;
 
-public class ConsoleUI implements UserInterface {
+public class ConsoleUI {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -30,28 +30,22 @@ public class ConsoleUI implements UserInterface {
     public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
-    @Override
     public void helloScreen() {
-        System.out.println("Swingy");
-        System.out.println("Select hero race:");
-        for(PersonRace r: PersonRace.values()) {
-            System.out.println(r.name());
-        }
-//        String race = controller.getInput();
+        System.out.println("|------------------------------|\n"
+                         + "|            SWINGY            |\n"
+                         + "|______________________________|\n");
 
     }
 
-    @Override
     public void chooseHero(List<Person> persons) {
         for (int i = 0; i < persons.size(); i++) {
-            System.out.printf("%d) %10s | Race: %10s | Level %3s\n", i,
+            System.out.printf("%d) %-25s | Race: %10s | Level %3s\n", i,
                     persons.get(i).getName(),
                     persons.get(i).getRace(),
                     persons.get(i).getLevel());
         }
     }
 
-    @Override
     public void chooseRace(List<PersonRace> races) {
         for (int i = 0; i < races.size(); i++) {
             System.out.printf("%d) %10s | HP: %3d | A %3d | D %3d | Ag %3d |\n", i,
@@ -63,7 +57,6 @@ public class ConsoleUI implements UserInterface {
         }
     }
 
-    @Override
     public void printPersonStat(Person p) {
         System.out.printf("\n==================== %s ====================\n", p.getName().toUpperCase());
         System.out.println(p.getRace() + " L" + p.getLevel() + " " + p.getExperience() + "/" + p.getNextLevelExperience());
@@ -109,16 +102,14 @@ public class ConsoleUI implements UserInterface {
         System.out.print("\033[H\033[2J");
     }
 
-    @Override
     public void updateGameArea(Area area) {
         clearScreen();
-        System.out.printf("==================== LEVEL %d =====================\n", area.getLevel());
+//        System.out.printf("==================== LEVEL %d =====================\n", area.getLevel());
         printPersonStat(area.getHero());
         printMap(area);
         System.out.println("Choose action:");
     }
 
-    @Override
     public void gameOverScreen(boolean isWin) {
         if (isWin) {
             System.out.printf("\n\n==================== YOU WIN! =====================\n");
@@ -128,29 +119,26 @@ public class ConsoleUI implements UserInterface {
         }
     }
 
-    @Override
     public void gameInfo() {
         clearScreen();
-        System.out.printf("w - up\n" +
-                          "s - down\n" +
-                          "a - left\n" +
-                          "d - right\n" +
-                          "m - switch mode\n" +
-                          "i - info\n" +
-                          "exit - exit\n");
+        System.out.println("Controls:\n"
+                          + "w - up\n"
+                          + "s - down\n"
+                          + "a - left\n"
+                          + "d - right\n"
+                          + "m - switch mode\n"
+                          + "i - info\n"
+                          + "exit - exit\n");
     }
 
-    @Override
     public void info(String message) {
         System.out.println(message);
     }
 
-    @Override
     public void isFight() {
         System.out.println("Do you want fight? (Y/n)");
     }
 
-    @Override
     public void fightInfo(Person person1, Person person2, int damage) {
 
         System.out.printf("%-30s", person1.getName() + "(" + person1.getRace() + ")[" + person1.getHitPoints() + "/" + person1.getFullHitPoints() + "]: ");
@@ -166,17 +154,15 @@ public class ConsoleUI implements UserInterface {
         }
     }
 
-    @Override
     public void equipInfo(boolean isEquip, Equipment equipment) {
         if (isEquip) {
-            System.out.println("You found " + equipment.getName());
+            System.out.println("You found " + equipment.getName().toUpperCase());
         }
         else {
-            System.out.println("You found " + equipment.getName() + ", but it has low stat and you throw it");
+            System.out.println("You found " + equipment.getName().toUpperCase() + ", but it has low stat and you throw it");
         }
     }
 
-    @Override
     public void aidInfo(Aid aid) {
         System.out.println("You found " + aid.getName()
                     + " | HP+" + aid.getBonusHitPoints()

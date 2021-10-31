@@ -4,14 +4,10 @@ public class Swingy {
 
     public static void main(String[] args) {
 
-        Game game;
-
         if (args.length == 1 && args[0].equalsIgnoreCase("console")) {
-            game = new Game(0);
-            game.start();
+            Game.getInstance(0).start();
         } else if (args.length == 1 && args[0].equalsIgnoreCase("gui")) {
-            game = new Game(1);
-            game.start();
+            Game.getInstance(1).start();
         } else {
             printUsage();
         }

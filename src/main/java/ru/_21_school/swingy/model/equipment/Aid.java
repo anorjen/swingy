@@ -1,5 +1,7 @@
 package ru._21_school.swingy.model.equipment;
 
+import javax.swing.*;
+
 public class Aid {
 
     private String name;
@@ -8,6 +10,7 @@ public class Aid {
     private int bonusHitPoints;
     private int bonusAgility;
     private int bonusExperience;
+    private ImageIcon icon;
 
     Aid(String name, int bonusHitPoints, int bonusAttack, int bonusDefense, int bonusAgility, int experience) {
         this.name = name;
@@ -40,5 +43,13 @@ public class Aid {
 
     public int getBonusExperience() {
         return bonusExperience;
+    }
+
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(ImageIcon icon) {
+        this.icon = icon;
     }
 }

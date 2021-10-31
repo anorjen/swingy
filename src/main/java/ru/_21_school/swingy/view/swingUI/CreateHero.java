@@ -1,12 +1,9 @@
-package ru._21_school.swingy.ui.swing;
+package ru._21_school.swingy.view.swingUI;
 
 import ru._21_school.swingy.model.person.Person;
-import ru._21_school.swingy.model.person.PersonFactory;
 import ru._21_school.swingy.model.person.PersonRace;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -17,6 +14,7 @@ public class CreateHero {
     private JFrame mainFrame;
     private JLabel iconLabel;
     private JTextPane statPane;
+    private DefaultListModel<PersonRace> personListModel;
     private JList<PersonRace> personList;
     private JButton createButton;
     private JTextField nameField;
@@ -28,14 +26,9 @@ public class CreateHero {
         prepareWindow();
     }
 
-    public static void main(String[] args) {
-        CreateHero chooseHero = new CreateHero();
-    }
-
     private void prepareWindow() {
         mainFrame = new JFrame("Create Hero");
         mainFrame.setSize(width, height);
-//        mainFrame.setMinimumSize(new Dimension(width, height));
         mainFrame.setPreferredSize(new Dimension(width, height));
         mainFrame.setResizable(false);
 
@@ -52,69 +45,24 @@ public class CreateHero {
 
         //Компоненты
         iconLabel = new JLabel();
-//        new ImageIcon("/home/dmitry/21-school/swingy/src/main/resources/human.gif")
-//        iconLabel.setPreferredSize(new Dimension(width / 2, height / 2));
-//        iconLabel.setMaximumSize(new Dimension(width / 2, height / 2));
-        iconLabel.setMinimumSize(new Dimension(120, 120));
+        iconLabel.setMinimumSize(new Dimension(128, 128));
         iconLabel.setBackground(Color.BLACK);
 
 
         statPane = new JTextPane();
-//        statPane.setPreferredSize(new Dimension(width / 2, height / 2));
-//        statPane.setMaximumSize(new Dimension(width / 2, height / 2));
-//        statPane.setMinimumSize(new Dimension(150, 120));
 
-        DefaultListModel<PersonRace> personListModel = new DefaultListModel<>();
+        personListModel = new DefaultListModel<>();
         personList = new JList<>(personListModel);
         personList.setPreferredSize(new Dimension(width, height / 2));
         personList.setMinimumSize(new Dimension(width, height / 2));
         personList.setListData(PersonRace.values());
-//        personList.setSelectedIndex(0);
 
-        personList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                PersonRace select = personList.getSelectedValue();
-                iconLabel.setIcon(new ImageIcon("src/main/resources/img/personLabels/" + select.name().toLowerCase() + ".gif"));
-                statPane.setText(String.format("%s\nHP: %d\nA: %d\nD: %d\nAg: %d",
-                                        select.name(),
-                                        select.getHitPoints(),
-                                        select.getAttack(),
-                                        select.getDefense(),
-                                        select.getAgility()));
-                createButton.setEnabled(!isEmpty(nameField.getText()));
-            }
-        });
 
         JLabel nameLabel = new JLabel("Set name: ");
         nameField = new JTextField(14);
 
-        nameField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) {}
-
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {}
-
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-                createButton.setEnabled(personList.getSelectedValue() != null && !isEmpty(nameField.getText()));
-            }
-        });
-
         createButton = new JButton("Create");
         createButton.setEnabled(false);
-//        createButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                PersonRace race = personList.getSelectedValue();
-//                String name = nameField.getText();
-//                if (race != null && !isEmpty(name)) {
-//                    hero = PersonFactory.newPerson(race, name.trim());
-//                    System.out.println(hero);
-//                }
-//            }
-//        });
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p1.add(nameLabel);
@@ -146,6 +94,7 @@ public class CreateHero {
         );
 
         mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
     }
 
@@ -175,5 +124,17 @@ public class CreateHero {
 
     public void setHero(Person hero) {
         this.hero = hero;
+    }
+
+    public DefaultListModel<PersonRace> getPersonListModel() {
+        return personListModel;
+    }
+
+    public JLabel getIconLabel() {
+        return iconLabel;
+    }
+
+    public JTextPane getStatPane() {
+        return statPane;
     }
 }

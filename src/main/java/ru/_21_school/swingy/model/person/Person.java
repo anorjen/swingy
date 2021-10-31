@@ -1,9 +1,12 @@
 package ru._21_school.swingy.model.person;
 
+import jakarta.validation.constraints.*;
 import ru._21_school.swingy.model.Coordinate;
 import ru._21_school.swingy.model.equipment.Aid;
 import ru._21_school.swingy.model.equipment.Equipment;
 
+
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,19 +14,31 @@ import static java.lang.Math.sqrt;
 
 public class Person {
 
+    @PositiveOrZero
     private Integer id;
+    @Size(min=1, max = 20, message = "Name must be 1-20 symbols")
+    @NotBlank(message = "Name can't be empty")
     private String name;
+    @NotNull
     private String race;
+    @PositiveOrZero
     private int level;
+    @PositiveOrZero
     private int experience;
+    @PositiveOrZero
     private int attack;
+    @PositiveOrZero
     private int defense;
+    @PositiveOrZero
     private int hitPoints;
+    @Positive
     private int fullHitPoints;
-    private int luck;
+    @PositiveOrZero
     private int agility;
     private List<Equipment> equipments;
     private Coordinate position;
+    private ImageIcon icon;
+    private ImageIcon label;
 
 
     Person() {
@@ -39,7 +54,6 @@ public class Person {
         this.agility = agility;
         this.experience = 0;
         this.level = 0;
-        this.luck = 0;
         this.equipments = new ArrayList<>();
     }
 
@@ -75,18 +89,6 @@ public class Person {
         return level;
     }
 
-//    public void setLevel() {
-//        int level = (int)(sqrt(experience * 9 / 50 - 80) -1) / 9;
-//        if (level > this.level) {
-//            this.fullHitPoints = (int) (this.fullHitPoints * 1.25);
-//            this.hitPoints = this.fullHitPoints;
-//            this.attack = (int) (this.attack * 1.25);
-//            this.defense = (int) (this.defense * 1.25);
-//            this.agility = (int) (this.agility * 1.25);
-//            this.level = level;
-//        }
-//    }
-
     public void levelUp() {
         this.fullHitPoints = (int) (this.fullHitPoints * 1.25);
         this.hitPoints = this.fullHitPoints;
@@ -94,6 +96,15 @@ public class Person {
         this.defense = (int) (this.defense * 1.25) + 1;
         this.agility = (int) (this.agility * 1.25) + 1;
         ++this.level;
+    }
+
+    public void levelDown() {
+        this.fullHitPoints = (int) (this.fullHitPoints / 1.25);
+        this.hitPoints = this.fullHitPoints;
+        this.attack = (int) ((this.attack - 1) / 1.25);
+        this.defense = (int) ((this.defense - 1) / 1.25);
+        this.agility = (int) ((this.agility - 1) / 1.25);
+        --this.level;
     }
 
     public void setExperience(int experience) {
@@ -110,9 +121,25 @@ public class Person {
 
     public void addExperience(int experience) {
         this.experience += experience;
-        int level = (int)(sqrt(this.experience * 9 / 50 - 80) - 1) / 9;
-        for (int i = 0; i < level - this.level; i++) {
-            levelUp();
+        if (this.experience >= getNextLevelExperience()) {
+            int level = (int) (sqrt(this.experience * 9 / 50 - 80) - 1) / 9;
+            while (level - this.level > 0) {
+                levelUp();
+            }
+        }
+    }
+
+    public void resumeExperience(int experience) {
+        this.experience -= experience;
+        if (this.experience < 0) {
+            this.experience = 0;
+        }
+        int level = 0;
+        if (this.experience > 1000) {
+            level = (int) (sqrt(this.experience * 9 / 50 - 80) - 1) / 9;
+        }
+        while (this.level - level > 0) {
+            levelDown();
         }
     }
 
@@ -155,14 +182,6 @@ public class Person {
 
     public void setFullHitPoints(int fullHitPoints) {
         this.fullHitPoints = fullHitPoints;
-    }
-
-    public int getLuck() {
-        return luck;
-    }
-
-    public void setLuck(int luck) {
-        this.luck = luck;
     }
 
     public int getAgility() {
@@ -249,45 +268,48 @@ public class Person {
 
     public void applyAid(Aid aid) {
         this.hitPoints += aid.getBonusHitPoints();
+        if (this.hitPoints > this.fullHitPoints) {
+            this.hitPoints = this.fullHitPoints;
+        }
         this.attack += aid.getBonusAttack();
         this.defense += aid.getBonusDefense();
         this.agility += aid.getBonusAgility();
         addExperience(aid.getBonusExperience());
     }
 
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", race='" + race + '\'' +
-                ", level=" + level +
-                ", experience=" + experience +
-                ", attack=" + attack +
-                ", defense=" + defense +
-                ", hitPoints=" + hitPoints + "/" + fullHitPoints +
-                ", agility=" + agility +
-                ", equipments=" + equipments +
-                '}';
-    }
-
     public String toStat() {
-        return String.format("%s(%s) L%d Exp: %d/%d\nHP: %d\nA: %d\nD: %d\nAg: %d\n",
-                        name,
-                        race,
+        String heroStat = String.format("LEVEL: %4d\nATTACK: %4d\nDEFENCE: %4d\nAGILITY: %4d\n\nEquipment:\n",
                         level,
-                        experience,
-                        getNextLevelExperience(),
-                        hitPoints,
                         attack,
                         defense,
                         agility);
+
+        StringBuilder equips = new StringBuilder();
+        for (Equipment e : equipments) {
+            equips.append(e.toStat())
+                        .append("\n");
+        }
+        return heroStat + equips.toString();
     }
 
-//    @Override
-//    public String toString() {
-//        return  name +
-//                ", race=" + race +
-//                ", level=" + level;
-//    }
+    @Override
+    public String toString() {
+        return String.format("%-20s | RACE: %-8s | LEVEL: %-3d", name, race, level);
+    }
+
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(ImageIcon icon) {
+        this.icon = icon;
+    }
+
+    public ImageIcon getLabel() {
+        return label;
+    }
+
+    public void setLabel(ImageIcon label) {
+        this.label = label;
+    }
 }

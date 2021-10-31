@@ -1,13 +1,9 @@
-package ru._21_school.swingy.ui.swing;
+package ru._21_school.swingy.view.swingUI;
 
 import ru._21_school.swingy.model.person.Person;
-import ru._21_school.swingy.model.person.PersonFactory;
-import ru._21_school.swingy.model.person.PersonRace;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import static javax.swing.GroupLayout.Alignment.*;
 
@@ -23,28 +19,15 @@ public class ChooseHero {
     private int width = 400;
     private int height = 400;
 
-    private Person hero;
-
     public ChooseHero() {
         prepareWindow();
-    }
-
-    public static void main(String[] args) {
-        ChooseHero chooseHero = new ChooseHero();
     }
 
     private void prepareWindow() {
         mainFrame = new JFrame("Choose Hero");
         mainFrame.setSize(width, height);
-//        mainFrame.setMinimumSize(new Dimension(width, height));
         mainFrame.setPreferredSize(new Dimension(width, height));
         mainFrame.setResizable(false);
-
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent windowEvent){
-                System.exit(0);
-            }
-        });
 
         GroupLayout layout = new GroupLayout(mainFrame.getContentPane());
         layout.setAutoCreateGaps(true);
@@ -52,27 +35,27 @@ public class ChooseHero {
         mainFrame.setLayout(layout);
 
         //Компоненты
-        iconLabel = new JLabel(new ImageIcon("src/main/resources/img/personLabels/human.gif"));
-//        iconLabel.setPreferredSize(new Dimension(width / 2, height / 2));
-//        iconLabel.setMaximumSize(new Dimension(width / 2, height / 2));
-//        iconLabel.setMinimumSize(new Dimension(120, 120));
+        iconLabel = new JLabel();
+        iconLabel.setMinimumSize(new Dimension(128, 128));
 
         statPane = new JTextPane();
-//        statPane.setPreferredSize(new Dimension(width / 2, height / 2));
-//        statPane.setMaximumSize(new Dimension(width / 2, height / 2));
-//        statPane.setMinimumSize(new Dimension(150, 120));
-        statPane.setText(PersonFactory.newPerson(PersonRace.values()[(int) (Math.random() * PersonRace.values().length)], "name").toStat());
 
         personListModel = new DefaultListModel<>();
         personList = new JList<>(personListModel);
         personList.setPreferredSize(new Dimension(width, height / 2));
         personList.setMinimumSize(new Dimension(width, height / 2));
-        for (int i = 0; i < 10; i++) {
-            personListModel.addElement(PersonFactory.newPerson(PersonRace.values()[(int) (Math.random() * PersonRace.values().length)], "name" + i));
-        }
+
+        personList.setLayoutOrientation(JList.VERTICAL);
+
+        Font defaultListFont = personList.getFont();
+        personList.setFont(new Font("monospaced", defaultListFont.getStyle(), defaultListFont.getSize()));
+        personList.setFixedCellWidth(60);
+
+        JScrollPane personScroll = new JScrollPane(personList);
 
         addButton = new JButton("add");
         deleteButton = new JButton("delete");
+        deleteButton.setEnabled(false);
         playButton = new JButton("Play");
         playButton.setEnabled(false);
 
@@ -89,7 +72,7 @@ public class ChooseHero {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(iconLabel)
                                 .addComponent(statPane))
-                        .addComponent(personList)
+                        .addComponent(personScroll)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(p1)
                                 .addComponent(p2))
@@ -100,52 +83,16 @@ public class ChooseHero {
                 .addGroup(layout.createParallelGroup(BASELINE)
                         .addComponent(iconLabel)
                         .addComponent(statPane))
-                .addComponent(personList)
+                .addComponent(personScroll)
                 .addGroup(layout.createParallelGroup(BASELINE)
                         .addComponent(p1)
                         .addComponent(p2))
         );
 
         mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
     }
-
-//    private void showEventDemo() {
-//        headerLabel.setText("Control in action: Button");
-//
-//        JButton okButton = new JButton("OK");
-//        JButton submitButton = new JButton("Submit");
-//        JButton cancelButton = new JButton("Cancel");
-//
-//        okButton.setActionCommand("OK");
-//        submitButton.setActionCommand("Submit");
-//        cancelButton.setActionCommand("Cancel");
-//
-//        okButton.addActionListener(new ButtonClickListener());
-//        submitButton.addActionListener(new ButtonClickListener());
-//        cancelButton.addActionListener(new ButtonClickListener());
-//
-//        controlPanel.add(okButton);
-//        controlPanel.add(submitButton);
-//        controlPanel.add(cancelButton);
-//
-//        mainFrame.setVisible(true);
-//    }
-//
-//    private class ButtonClickListener implements ActionListener {
-//        public void actionPerformed(ActionEvent e) {
-//            String command = e.getActionCommand();
-//
-//            if( command.equals( "OK" ))  {
-//                statusLabel.setText("Ok Button clicked.");
-//            } else if( command.equals( "Submit" ) )  {
-//                statusLabel.setText("Submit Button clicked.");
-//            } else {
-//                statusLabel.setText("Cancel Button clicked.");
-//            }
-//        }
-//    }
-
 
     public JFrame getMainFrame() {
         return mainFrame;
@@ -183,11 +130,4 @@ public class ChooseHero {
         return personListModel;
     }
 
-    public Person getHero() {
-        return hero;
-    }
-
-    public void setHero(Person hero) {
-        this.hero = hero;
-    }
 }

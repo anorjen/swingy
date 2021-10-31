@@ -18,6 +18,17 @@ public class Area {
     private Person hero;
     private Object[][] area;
 
+    public Area(Person hero) {
+        this.hero = hero;
+        this.level = hero.getLevel();
+        size = 5 * level + 4;
+        hero.setPosition(new Coordinate(size / 2, size / 2));
+        area = new Object[size][size];
+        fillAids();
+        fillBlocks();
+        fillEnemies();
+    }
+
     public Area(int level, Person hero) {
         this.hero = hero;
         this.level = level;

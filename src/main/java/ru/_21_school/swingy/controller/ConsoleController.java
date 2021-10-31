@@ -1,5 +1,6 @@
 package ru._21_school.swingy.controller;
 
+import ru._21_school.swingy.Game;
 import ru._21_school.swingy.database.DatabaseService;
 import ru._21_school.swingy.model.Area;
 import ru._21_school.swingy.model.equipment.Aid;
@@ -8,7 +9,7 @@ import ru._21_school.swingy.exception.SwingyException;
 import ru._21_school.swingy.model.person.Person;
 import ru._21_school.swingy.model.person.PersonFactory;
 import ru._21_school.swingy.model.person.PersonRace;
-import ru._21_school.swingy.ui.ConsoleUI;
+import ru._21_school.swingy.view.ConsoleUI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class ConsoleController implements Controller {
     static private final ConsoleUI ui = new ConsoleUI();
 
     @Override
-    public Person selectHero(List<Person> personList) {
+    public void selectHero(List<Person> personList) {
+        ui.helloScreen();
         List<PersonRace> races = Arrays.asList(PersonRace.values());
 
         Person person = null;
@@ -30,8 +32,10 @@ public class ConsoleController implements Controller {
             int choose = chooseHero(personList);
             if (choose == personList.size() + 1) {
                 int deleteNumber = deleteHero(personList);
-                DatabaseService.getInstance().deletePerson(personList.get(deleteNumber));
-                personList.remove(personList.get(deleteNumber));
+                if (deleteNumber >= 0 && deleteNumber < personList.size()) {
+                    DatabaseService.getInstance().deletePerson(personList.get(deleteNumber));
+                    personList.remove(personList.get(deleteNumber));
+                }
             }
             else if (choose == personList.size()) {
                 personList.add(createNewHero(races));
@@ -40,7 +44,11 @@ public class ConsoleController implements Controller {
                 person = personList.get(choose);
             }
         }
-        return person;
+        ui.gameInfo();
+        Game.getInstance().setHero(person);
+        Game.getInstance().validateHero();
+        Game.getInstance().setArea(new Area(person));
+        Game.getInstance().play();
     }
 
     private Integer deleteHero(List<Person> persons) {
@@ -49,13 +57,17 @@ public class ConsoleController implements Controller {
         Integer nPerson = null;
         while (nPerson == null) {
             try {
-                String choose = reader.readLine();
-                nPerson = Integer.parseInt(choose);
+                String input = reader.readLine();
+                if (input.equals("return")) {
+                    return -1;
+                }
+                nPerson = Integer.parseInt(input);
                 if (nPerson < 0 || nPerson >= persons.size()) {
-                    throw new SwingyException("Wrong choose!");
+                    throw new SwingyException("Wrong choose: " + input + " !");
                 }
             } catch (Exception ex) {
-                ui.info(ex.getMessage() + " Repeat input:");
+                nPerson = null;
+                ui.info("ERROR: "+  ex.getMessage() + "| For return type \"return\" |" + " Repeat input:");
             }
         }
         return nPerson;
@@ -69,12 +81,17 @@ public class ConsoleController implements Controller {
         while (nPerson == null) {
             try {
                 String input = reader.readLine();
+                if (input.equals("exit")) {
+                    Game.getInstance().exitGame();
+                }
                 nPerson = Integer.parseInt(input);
-                if (nPerson < 0 || nPerson >= persons.size() + 1) {
-                    throw new SwingyException("Wrong choose!");
+                // Список героев и пункты создать удалить
+                if (nPerson < 0 || nPerson > persons.size() + 1) {
+                    throw new SwingyException("Wrong choose: " + input + " !");
                 }
             } catch (Exception ex) {
-                ui.info(ex.getMessage() + " Repeat input:");
+                nPerson = null;
+                ui.info("ERROR: " + ex.getMessage() + "| Repeat input:");
             }
         }
         return nPerson;
@@ -91,8 +108,12 @@ public class ConsoleController implements Controller {
                 if (name.isEmpty()){
                     throw new SwingyException("Empty name!");
                 }
+                else if (name.length() > 20) {
+                    throw new SwingyException("Name must be 1-20 symbols");
+                }
             } catch (Exception ex) {
-                ui.info(ex.getMessage() + " Repeat input:");
+                name = null;
+                ui.info("ERROR: " + ex.getMessage() + "| Repeat input:");
             }
         }
         return PersonFactory.newPerson(race, name);
@@ -110,40 +131,69 @@ public class ConsoleController implements Controller {
                 }
                 race = races.get(nRace);
             } catch (Exception ex) {
-                ui.info(ex.getMessage() + " Repeat input:");
+                ui.info("ERROR: " + ex.getMessage() + " Repeat input:");
             }
         }
         return race;
     }
 
-    public String play(Person hero, Area area) {
-        ui.updateGameArea(area);
-        String action = null;
-        while (true) {
-            try {
-                action = reader.readLine().trim().toLowerCase();
-            } catch (IOException e) {
-                ui.info(e.getMessage());
-            }
-            if (action != null && !action.isEmpty()
-                    && ("w".equals(action)
-                    || "s".equals(action)
-                    || "a".equals(action)
-                    || "d".equals(action)
-                    || "m".equals(action)
-                    || "i".equals(action))
-                    || "exit".equals(action)
-                    || "iddqd".equals(action)) {
-                return action;
-            }
-            else {
-                ui.info("Repeat input:");
-            }
+    private boolean takeAction(String action) {
+        switch (action) {
+            case "w" :
+                return Game.getInstance().moveHero(0, -1);
+            case "s":
+                return Game.getInstance().moveHero(0, 1);
+            case "a":
+                return Game.getInstance().moveHero(-1, 0);
+            case "d":
+                return Game.getInstance().moveHero(1, 0);
+            case "m":
+                Game.getInstance().changeGameMode();
+                return false;
+            case "i":
+                gameInfo();
+                break;
+            case "exit":
+                return false;
+            case "iddqd":
+                Game.getInstance().getHero().setHitPoints(1000);
+                break;
         }
+        return true;
     }
 
-    @Override
-    public void gameInfo() {
+    public void play() {
+        boolean isPlay = true;
+        while (isPlay) {
+            ui.updateGameArea(Game.getInstance().getArea());
+            String action = null;
+
+            while (true) {
+                try {
+                    action = reader.readLine().trim().toLowerCase();
+                } catch (IOException e) {
+                    ui.info(e.getMessage());
+                }
+                if (action != null && !action.isEmpty()
+                        && ("w".equals(action)
+                        || "s".equals(action)
+                        || "a".equals(action)
+                        || "d".equals(action)
+                        || "m".equals(action)
+                        || "i".equals(action))
+                        || "exit".equals(action)
+                        || "iddqd".equals(action)) {
+                    break;
+                } else {
+                    ui.info("Repeat input:");
+                }
+            }
+            isPlay = takeAction(action);
+        }
+        gameOver();
+    }
+
+    private void gameInfo() {
         ui.gameInfo();
         try {
             reader.readLine();
@@ -154,7 +204,7 @@ public class ConsoleController implements Controller {
     }
 
     @Override
-    public boolean isFight(Person enemy) {
+    public void fightOrFlee(Person enemy) {
         ui.printPersonStat(enemy);
         ui.isFight();
         String answer = "";
@@ -164,7 +214,25 @@ public class ConsoleController implements Controller {
         catch (IOException ex) {
             ui.info(ex.getMessage());
         }
-        return !answer.equals("n") && !answer.equals("no");
+        if ((answer.equals("n") || answer.equals("no")) && Game.getInstance().tryToFlee()) {
+            ui.info("You have carefully bypassed the enemy.");
+        }
+        else {
+            if ((answer.equals("n") || answer.equals("no"))) {
+                ui.info("You tried to sneak unnoticed, but the enemy noticed you.");
+            }
+            else {
+                ui.info("You rush into battle.");
+            }
+            Game.getInstance().fight();
+            if (!Game.getInstance().getHero().isDead()) {
+                Game.getInstance().trophy();
+            }
+            else {
+                ui.info("YOU DIED!");
+                Game.getInstance().exitGame();
+            }
+        }
     }
 
     @Override
@@ -183,7 +251,20 @@ public class ConsoleController implements Controller {
     }
 
     @Override
-    public void gameOver(boolean isWin) {
-        ui.gameOverScreen(isWin);
+    public void gameOver() {
+        Person hero = Game.getInstance().getHero();
+        if (hero.isDead()) {
+            Game.getInstance().heroIsDead();
+            ui.gameOverScreen(false);
+        }
+        else if (hero.getLevel() >= Game.MAX_GAME_LEVEL) {
+            ui.gameOverScreen(true);
+        }
+        else if (Game.getInstance().getMode() == 1) {
+            ui.info("Switch to GUI");
+        }
+        else {
+            ui.info("You are chicken!");
+        }
     }
 }

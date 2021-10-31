@@ -1,10 +1,19 @@
 package ru._21_school.swingy.model.equipment;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public class Equipment {
+    @NotBlank
     private String name;
+    @NotNull
     private String type;
+    @PositiveOrZero
     private double bonusAttack;
+    @PositiveOrZero
     private double bonusDefense;
+    @PositiveOrZero
     private double bonusHitPoints;
 
     Equipment() {
@@ -67,5 +76,9 @@ public class Equipment {
                 ", bonusDefense=" + bonusDefense +
                 ", bonusHitPoints=" + bonusHitPoints +
                 '}';
+    }
+
+    public String toStat() {
+        return name.toUpperCase();
     }
 }
