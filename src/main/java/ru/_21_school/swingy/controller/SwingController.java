@@ -31,6 +31,7 @@ public class SwingController implements Controller {
 
         chooseHeroWindow.getMainFrame().addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
+                chooseHeroWindow.getMainFrame().dispose();
                 Game.getInstance().exitGame();
             }
         });
@@ -91,6 +92,13 @@ public class SwingController implements Controller {
 
     private void createNewHero() {
         createHeroWindow = new CreateHero();
+
+        createHeroWindow.getMainFrame().addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent windowEvent) {
+                chooseHeroWindow.getMainFrame().setVisible(true);
+                createHeroWindow.getMainFrame().dispose();
+            }
+        });
 
         createHeroWindow.getPersonList().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -202,15 +210,14 @@ public class SwingController implements Controller {
             public void actionPerformed(ActionEvent actionEvent) {
                 if (Game.getInstance().tryToFlee()) {
                     escapeBattle();
+                    updateHeroPane(Game.getInstance().getHero());
+                    updateEnemyPane(null);
+                    resetButtons();
                 } else {
                     logger("You tried to sneak unnoticed, but the enemy noticed you." );
-                    Game.getInstance().fight();
-                    isDied();
-                    Game.getInstance().trophy();
+                    fight();
                 }
-                updateHeroPane(Game.getInstance().getHero());
-                updateEnemyPane(null);
-                resetButtons();
+
             }
         });
 
@@ -218,13 +225,8 @@ public class SwingController implements Controller {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 logger("You rush into battle.");
-                Game.getInstance().fight();
-                isDied();
-                Game.getInstance().trophy();
-                updateHeroPane(Game.getInstance().getHero());
-                updateEnemyPane(null);
-                resetButtons();
 
+                fight();
             }
         });
 
@@ -236,6 +238,33 @@ public class SwingController implements Controller {
             }
         });
 
+    }
+
+    private void fight() {
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Void doInBackground() {
+                Game.getInstance().fight();
+                return null;
+            }
+            //				this method is called when the background thread finishes execution
+            @Override
+            protected void done() {
+                isDied();
+                int heroLevel = Game.getInstance().getHero().getLevel();
+                Game.getInstance().trophy();
+                if (Game.getInstance().getHero().getLevel() > heroLevel) {
+                    logger("LEVEL UP");
+                }
+                updateHeroPane(Game.getInstance().getHero());
+                updateEnemyPane(null);
+
+                resetButtons();
+            }
+        };
+        sw.execute();
+        gameAreaWindow.getFightButton().setEnabled(false);
+        gameAreaWindow.getFleeButton().setEnabled(false);
     }
 
     private void logger(String s) {
@@ -278,7 +307,7 @@ public class SwingController implements Controller {
     }
 
     @Override
-    public void fight(Person person1, Person person2, int damage) {
+    public void fightLog(Person person1, Person person2, int damage) {
         String who = String.format("%-30s", person1.getName() + "(" + person1.getRace() + ")[" + person1.getHitPoints() + "/" + person1.getFullHitPoints() + "]: ");
         if (damage == 0) {
             logger(who + "attack and miss.");
@@ -290,6 +319,7 @@ public class SwingController implements Controller {
             who = String.format("%-30s", person2.getName() + "(" + person2.getRace() + ")[" + person2.getHitPoints() + "/" + person2.getFullHitPoints() + "]: ");
             logger(who + "is dead.");
         }
+        gameAreaWindow.getLogTextArea().setCaretPosition(gameAreaWindow.getLogTextArea().getDocument().getLength());
         updateEnemyPane(Game.getInstance().getEnemy());
         updateHeroPane(Game.getInstance().getHero());
     }

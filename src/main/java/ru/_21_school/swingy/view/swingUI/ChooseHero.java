@@ -39,6 +39,7 @@ public class ChooseHero {
         iconLabel.setMinimumSize(new Dimension(128, 128));
 
         statPane = new JTextPane();
+        statPane.setEditable(false);
 
         personListModel = new DefaultListModel<>();
         personList = new JList<>(personListModel);

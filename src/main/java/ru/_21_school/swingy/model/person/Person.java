@@ -285,9 +285,11 @@ public class Person {
                         agility);
 
         StringBuilder equips = new StringBuilder();
-        for (Equipment e : equipments) {
-            equips.append(e.toStat())
-                        .append("\n");
+        for (int i = 0; i < equipments.size(); i++) {
+            equips.append(i + 1)
+                    .append(". ")
+                    .append(equipments.get(i).toStat())
+                    .append("\n");
         }
         return heroStat + equips.toString();
     }

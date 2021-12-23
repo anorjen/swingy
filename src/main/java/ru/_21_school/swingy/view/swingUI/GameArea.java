@@ -27,6 +27,7 @@ public class GameArea {
     private JLabel heroIconLabel;
     private JLabel heroNameLabel;
     private JTextPane heroStatPane;
+    private JScrollPane logScrollPane;
     private JProgressBar heroHpBar;
     private JProgressBar heroExpBar;
 
@@ -137,7 +138,7 @@ public class GameArea {
         Font defaultListFont = logTextArea.getFont();
         logTextArea.setFont(new Font("monospaced", defaultListFont.getStyle(), defaultListFont.getSize()));
 
-        JScrollPane logScrollPane = new JScrollPane(logTextArea);
+        logScrollPane = new JScrollPane(logTextArea);
         logScrollPane.setPreferredSize(new Dimension(VIEW_SIZE * ICON_SIZE, VIEW_SIZE * ICON_SIZE / 2));
         logScrollPane.setAutoscrolls(true);
         logScrollPane.getVerticalScrollBar().setValue(logScrollPane.getVerticalScrollBar().getValue());
@@ -357,6 +358,10 @@ public class GameArea {
 
     public JLabel getHeroNameLabel() {
         return heroNameLabel;
+    }
+
+    public JScrollPane getLogScrollPane() {
+        return logScrollPane;
     }
 }
 

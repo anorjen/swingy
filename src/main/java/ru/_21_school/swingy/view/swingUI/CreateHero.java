@@ -30,12 +30,6 @@ public class CreateHero {
         mainFrame.setPreferredSize(new Dimension(width, height));
         mainFrame.setResizable(false);
 
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent windowEvent) {
-                System.exit(0);
-            }
-        });
-
         GroupLayout layout = new GroupLayout(mainFrame.getContentPane());
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -48,6 +42,7 @@ public class CreateHero {
 
 
         statPane = new JTextPane();
+        statPane.setEditable(false);
 
         personListModel = new DefaultListModel<>();
         personList = new JList<>(personListModel);

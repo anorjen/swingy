@@ -147,10 +147,15 @@ public class Game {
         int damage = 0;
         while (!hero.isDead() && !enemy.isDead()) {
             damage = hero.attack(enemy);
-            controller.fight(hero, enemy, damage);
+            controller.fightLog(hero, enemy, damage);
             if (!enemy.isDead()) {
                 damage = enemy.attack(hero);
-                controller.fight(enemy, hero, damage);
+                controller.fightLog(enemy, hero, damage);
+            }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

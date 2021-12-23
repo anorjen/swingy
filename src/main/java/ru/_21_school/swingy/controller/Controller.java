@@ -10,7 +10,7 @@ public interface Controller {
 
     void selectHero(List<Person> persons);
     void play();
-    void fight(Person person1, Person person2, int damage);
+    void fightLog(Person person1, Person person2, int damage);
     void equip(boolean isEquip, Equipment equipment);
     void applyAid(Aid aid);
     void fightOrFlee(Person enemy);

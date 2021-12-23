@@ -38,7 +38,10 @@ public class ConsoleController implements Controller {
                 }
             }
             else if (choose == personList.size()) {
-                personList.add(createNewHero(races));
+                Person newHero = createNewHero(races);
+                if (newHero != null) {
+                    personList.add(newHero);
+                }
             }
             else {
                 person = personList.get(choose);
@@ -100,11 +103,15 @@ public class ConsoleController implements Controller {
     private Person createNewHero(List<PersonRace> races) {
         ui.chooseRace(races);
         PersonRace race = chooseRace(races);
+        if (race == null) {
+            return null;
+        }
         ui.info("Write hero name:");
         String name = null;
         while (name == null || name.isEmpty()) {
             try {
                 name = reader.readLine().trim();
+
                 if (name.isEmpty()){
                     throw new SwingyException("Empty name!");
                 }
@@ -125,6 +132,9 @@ public class ConsoleController implements Controller {
         while (race == null) {
             try {
                 String choose = reader.readLine();
+                if (choose.equals("return")) {
+                    return null;
+                }
                 int nRace = Integer.parseInt(choose);
                 if (nRace < 0 || nRace >= races.size()) {
                     throw new SwingyException("Wrong choose!");
@@ -236,7 +246,7 @@ public class ConsoleController implements Controller {
     }
 
     @Override
-    public void fight(Person person1, Person person2, int damage) {
+    public void fightLog(Person person1, Person person2, int damage) {
         ui.fightInfo(person1, person2, damage);
     }
 
@@ -251,19 +261,19 @@ public class ConsoleController implements Controller {
     }
 
     public void gameOver() {
-        Person hero = Game.getInstance().getHero();
-        if (hero.isDead()) {
-            Game.getInstance().heroIsDead();
-            ui.gameOverScreen(false);
-        }
-        else if (hero.getLevel() >= Game.MAX_GAME_LEVEL) {
-            ui.gameOverScreen(true);
-        }
-        else if (Game.getInstance().getMode() == 1) {
+        if (Game.getInstance().getMode() == 1) {
             ui.info("Switch to GUI");
-        }
-        else {
-            ui.info("You are chicken!");
+        } else {
+            Person hero = Game.getInstance().getHero();
+            if (hero.isDead()) {
+                Game.getInstance().heroIsDead();
+                ui.gameOverScreen(false);
+            } else if (hero.getLevel() >= Game.MAX_GAME_LEVEL) {
+                ui.gameOverScreen(true);
+            } else {
+                ui.info("You are chicken!");
+            }
+            Game.getInstance().exitGame();
         }
     }
 }
